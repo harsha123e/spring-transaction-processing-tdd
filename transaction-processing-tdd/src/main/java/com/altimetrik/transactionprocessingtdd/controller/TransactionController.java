@@ -11,7 +11,16 @@ public class TransactionController {
 
 	@PostMapping("/upload")
 	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-
+		String contentType = file.getContentType();
+		if (contentType != null && !isValidFileType(contentType)) {
+			return ResponseEntity.badRequest().body("Invalid file type");
+		}
 		return ResponseEntity.ok("File uploaded successfully");
+	}
+
+	private boolean isValidFileType(String contentType) {
+		return contentType.equals("application/vnd.ms-excel")
+				|| contentType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+				|| contentType.equals("text/csv") || contentType.startsWith("text/");
 	}
 }
