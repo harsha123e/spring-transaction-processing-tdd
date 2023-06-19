@@ -1,0 +1,5 @@
+transaction id,card,card number/wallettype,expiry date/upi id,cvv/balance,amount,remarks
+123424313,card,876998799879,23-01-2020,123,123.412,card processing
+12346234213,card,876998799879,23-01-2020,123,123.412,card processing
+1234653213,wallet,e-wallet,paytm,1237,123.412,wallet processing
+1265234213,wallet,digi-wallet,paytm,1238,123.412,wallet processing
