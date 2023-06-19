@@ -11,6 +11,10 @@ public class TransactionController {
 
 	@PostMapping("/upload")
 	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+		if (file.isEmpty()) {
+			return ResponseEntity.badRequest().body("File is empty");
+		}
+
 		String contentType = file.getContentType();
 		if (contentType != null && !isValidFileType(contentType)) {
 			return ResponseEntity.badRequest().body("Invalid file type");
