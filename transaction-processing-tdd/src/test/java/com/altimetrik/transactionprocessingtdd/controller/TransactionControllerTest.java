@@ -37,4 +37,19 @@ class TransactionControllerTest {
 
 	}
 
+	@Test
+	public void testUploadFile_WithInvalidFileType_ReturnsBadRequest() throws Exception {
+		String filePath = System.getProperty("user.dir") + "/src/test/resources/invalid_file.pdf";
+
+		String controllerParam = "file";
+		String originalFileName = "invalid_file.pdf";
+		String contentType = "application/pdf"; // Invalid file type
+		Path path = Paths.get(filePath);
+		byte[] fileContent = Files.readAllBytes(path);
+		MockMultipartFile file = new MockMultipartFile(controllerParam, originalFileName, contentType, fileContent);
+
+		mockMvc.perform(MockMvcRequestBuilders.multipart("/upload").file(file))
+				.andExpect(MockMvcResultMatchers.status().isBadRequest());
+	}
+
 }
