@@ -52,4 +52,14 @@ class TransactionControllerTest {
 				.andExpect(MockMvcResultMatchers.status().isBadRequest());
 	}
 
+	@Test
+	public void testUploadFile_WithEmptyFile_ReturnsBadRequest() throws Exception {
+		byte[] emptyFileContent = new byte[0]; // Empty file content
+		MockMultipartFile file = new MockMultipartFile("file", "empty.csv", "text/csv", emptyFileContent);
+
+		mockMvc.perform(MockMvcRequestBuilders.multipart("/upload").file(file))
+				.andExpect(MockMvcResultMatchers.status().isBadRequest())
+				.andExpect(MockMvcResultMatchers.content().string("File is empty"));
+	}
+
 }
