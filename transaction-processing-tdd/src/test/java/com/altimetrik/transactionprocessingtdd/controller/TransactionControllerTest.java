@@ -38,6 +38,23 @@ class TransactionControllerTest {
 	}
 
 	@Test
+	public void testUploadFile_WithValidExcelFile_ReturnsSuccessResponse() throws Exception {
+		String filePath = System.getProperty("user.dir") + "/src/test/resources/transactions.xlsx";
+
+		String controllerParam = "file";
+		String originalFileName = "transactions.xlsx";
+		String contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+		Path path = Paths.get(filePath);
+		byte[] fileContent = Files.readAllBytes(path);
+		MockMultipartFile file = new MockMultipartFile(controllerParam, originalFileName, contentType, fileContent);
+
+		mockMvc.perform(MockMvcRequestBuilders.multipart("/upload").file(file))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string("File uploaded successfully"));
+
+	}
+
+	@Test
 	public void testUploadFile_WithInvalidFileType_ReturnsBadRequest() throws Exception {
 		String filePath = System.getProperty("user.dir") + "/src/test/resources/invalid_file.pdf";
 
