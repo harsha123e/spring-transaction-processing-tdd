@@ -1,5 +1,7 @@
 package com.altimetrik.transactionprocessingtdd.model;
 
+import java.time.LocalDate;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -9,10 +11,21 @@ public class CardTransaction {
 	@Id
 	private String transactionId;
 	private String cardNumber;
-	private String expiryDate;
-	private String cvv;
+	private LocalDate expiryDate;
+	private int cvv;
 	private double amount;
 	private String remarks;
+
+	public CardTransaction(String transactionId, String cardNumber, LocalDate expiryDate, int cvv, double amount,
+			String remarks) {
+		super();
+		this.transactionId = transactionId;
+		this.cardNumber = cardNumber;
+		this.expiryDate = expiryDate;
+		this.cvv = cvv;
+		this.amount = amount;
+		this.remarks = remarks;
+	}
 
 	public String getTransactionId() {
 		return transactionId;
@@ -30,19 +43,19 @@ public class CardTransaction {
 		this.cardNumber = cardNumber;
 	}
 
-	public String getExpiryDate() {
+	public LocalDate getExpiryDate() {
 		return expiryDate;
 	}
 
-	public void setExpiryDate(String expiryDate) {
+	public void setExpiryDate(LocalDate expiryDate) {
 		this.expiryDate = expiryDate;
 	}
 
-	public String getCvv() {
+	public int getCvv() {
 		return cvv;
 	}
 
-	public void setCvv(String cvv) {
+	public void setCvv(int cvv) {
 		this.cvv = cvv;
 	}
 

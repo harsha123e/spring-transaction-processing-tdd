@@ -14,6 +14,17 @@ public class WalletTransaction {
 	private double amount;
 	private String remarks;
 
+	public WalletTransaction(String transactionId, String walletType, String upiId, double balance, double amount,
+			String remarks) {
+		super();
+		this.transactionId = transactionId;
+		this.walletType = walletType;
+		this.upiId = upiId;
+		this.balance = balance;
+		this.amount = amount;
+		this.remarks = remarks;
+	}
+
 	public String getTransactionId() {
 		return transactionId;
 	}
