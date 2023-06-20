@@ -16,6 +16,10 @@ public class CardTransaction {
 	private double amount;
 	private String remarks;
 
+	public CardTransaction() {
+		super();
+	}
+
 	public CardTransaction(String transactionId, String cardNumber, LocalDate expiryDate, int cvv, double amount,
 			String remarks) {
 		super();

@@ -14,6 +14,10 @@ public class WalletTransaction {
 	private double amount;
 	private String remarks;
 
+	public WalletTransaction() {
+		super();
+	}
+
 	public WalletTransaction(String transactionId, String walletType, String upiId, double balance, double amount,
 			String remarks) {
 		super();
