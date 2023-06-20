@@ -4,16 +4,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-@SpringBootTest
+@WebMvcTest
 @AutoConfigureMockMvc
 class TransactionControllerTest {
 
@@ -21,6 +22,7 @@ class TransactionControllerTest {
 	private MockMvc mockMvc;
 
 	@Test
+	@DisplayName("Valid csv file upload")
 	public void testUploadFile_WithValidCSVFile_ReturnsSuccessResponse() throws Exception {
 		String filePath = System.getProperty("user.dir") + "/src/test/resources/transactions.csv";
 
@@ -38,6 +40,7 @@ class TransactionControllerTest {
 	}
 
 	@Test
+	@DisplayName("Valid excel file upload")
 	public void testUploadFile_WithValidExcelFile_ReturnsSuccessResponse() throws Exception {
 		String filePath = System.getProperty("user.dir") + "/src/test/resources/transactions.xlsx";
 
@@ -55,6 +58,7 @@ class TransactionControllerTest {
 	}
 
 	@Test
+	@DisplayName("Valid text file upload")
 	public void testUploadFile_WithValidTextFile_ReturnsSuccessResponse() throws Exception {
 		String filePath = System.getProperty("user.dir") + "/src/test/resources/transactions.txt";
 
@@ -72,6 +76,7 @@ class TransactionControllerTest {
 	}
 
 	@Test
+	@DisplayName("Invalid file upload")
 	public void testUploadFile_WithInvalidFileType_ReturnsBadRequest() throws Exception {
 		String filePath = System.getProperty("user.dir") + "/src/test/resources/invalid_file.pdf";
 
@@ -87,6 +92,7 @@ class TransactionControllerTest {
 	}
 
 	@Test
+	@DisplayName("Empty file upload")
 	public void testUploadFile_WithEmptyFile_ReturnsBadRequest() throws Exception {
 		byte[] emptyFileContent = new byte[0]; // Empty file content
 		MockMultipartFile file = new MockMultipartFile("file", "empty.csv", "text/csv", emptyFileContent);
