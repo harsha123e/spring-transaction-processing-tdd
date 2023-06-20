@@ -55,6 +55,23 @@ class TransactionControllerTest {
 	}
 
 	@Test
+	public void testUploadFile_WithValidTextFile_ReturnsSuccessResponse() throws Exception {
+		String filePath = System.getProperty("user.dir") + "/src/test/resources/transactions.txt";
+
+		String controllerParam = "file";
+		String originalFileName = "transactions.txt";
+		String contentType = "text/plain;charset=UTF-8";
+		Path path = Paths.get(filePath);
+		byte[] fileContent = Files.readAllBytes(path);
+		MockMultipartFile file = new MockMultipartFile(controllerParam, originalFileName, contentType, fileContent);
+
+		mockMvc.perform(MockMvcRequestBuilders.multipart("/upload").file(file))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string("File uploaded successfully"));
+
+	}
+
+	@Test
 	public void testUploadFile_WithInvalidFileType_ReturnsBadRequest() throws Exception {
 		String filePath = System.getProperty("user.dir") + "/src/test/resources/invalid_file.pdf";
 
