@@ -1,25 +1,34 @@
 package com.altimetrik.transactionprocessingtdd.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-@WebMvcTest
-@AutoConfigureMockMvc
+import com.altimetrik.transactionprocessingtdd.service.TransactionService;
+
+@ExtendWith(MockitoExtension.class)
 class TransactionControllerTest {
 
-	@Autowired
-	private MockMvc mockMvc;
+	@Mock
+	private TransactionService transactionService;
+
+	@InjectMocks
+	private TransactionController transactionController;
 
 	@Test
 	@DisplayName("Valid csv file upload")
@@ -33,9 +42,10 @@ class TransactionControllerTest {
 		byte[] fileContent = Files.readAllBytes(path);
 		MockMultipartFile file = new MockMultipartFile(controllerParam, originalFileName, contentType, fileContent);
 
-		mockMvc.perform(MockMvcRequestBuilders.multipart("/upload").file(file))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.content().string("File uploaded successfully"));
+		ResponseEntity<String> response = transactionController.uploadFile(file);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals("File uploaded successfully", response.getBody());
 
 	}
 
@@ -51,9 +61,10 @@ class TransactionControllerTest {
 		byte[] fileContent = Files.readAllBytes(path);
 		MockMultipartFile file = new MockMultipartFile(controllerParam, originalFileName, contentType, fileContent);
 
-		mockMvc.perform(MockMvcRequestBuilders.multipart("/upload").file(file))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.content().string("File uploaded successfully"));
+		ResponseEntity<String> response = transactionController.uploadFile(file);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals("File uploaded successfully", response.getBody());
 
 	}
 
@@ -69,9 +80,10 @@ class TransactionControllerTest {
 		byte[] fileContent = Files.readAllBytes(path);
 		MockMultipartFile file = new MockMultipartFile(controllerParam, originalFileName, contentType, fileContent);
 
-		mockMvc.perform(MockMvcRequestBuilders.multipart("/upload").file(file))
-				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.content().string("File uploaded successfully"));
+		ResponseEntity<String> response = transactionController.uploadFile(file);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals("File uploaded successfully", response.getBody());
 
 	}
 
@@ -87,8 +99,10 @@ class TransactionControllerTest {
 		byte[] fileContent = Files.readAllBytes(path);
 		MockMultipartFile file = new MockMultipartFile(controllerParam, originalFileName, contentType, fileContent);
 
-		mockMvc.perform(MockMvcRequestBuilders.multipart("/upload").file(file))
-				.andExpect(MockMvcResultMatchers.status().isBadRequest());
+		ResponseEntity<String> response = transactionController.uploadFile(file);
+
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
 	}
 
 	@Test
@@ -97,9 +111,27 @@ class TransactionControllerTest {
 		byte[] emptyFileContent = new byte[0]; // Empty file content
 		MockMultipartFile file = new MockMultipartFile("file", "empty.csv", "text/csv", emptyFileContent);
 
-		mockMvc.perform(MockMvcRequestBuilders.multipart("/upload").file(file))
-				.andExpect(MockMvcResultMatchers.status().isBadRequest())
-				.andExpect(MockMvcResultMatchers.content().string("File is empty"));
+		ResponseEntity<String> response = transactionController.uploadFile(file);
+
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+		assertEquals("File is empty", response.getBody());
+
+	}
+
+	@Test
+	@DisplayName("IOException when processing file")
+	public void testUploadFile_WithIOException_ReturnsBadRequest() throws Exception {
+		MockMultipartFile file = new MockMultipartFile("file", "transactions.csv", "text/csv",
+				"file content".getBytes());
+
+		doAnswer(invocation -> {
+			throw new IOException("Unable to access file");
+		}).when(transactionService).processAndSaveTransactions(any(byte[].class));
+
+		ResponseEntity<String> response = transactionController.uploadFile(file);
+
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+		assertEquals("Unable to access file", response.getBody());
 	}
 
 }
