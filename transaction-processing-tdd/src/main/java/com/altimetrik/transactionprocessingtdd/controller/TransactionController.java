@@ -1,5 +1,7 @@
 package com.altimetrik.transactionprocessingtdd.controller;
 
+import java.util.Set;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,16 +17,17 @@ public class TransactionController {
 			return ResponseEntity.badRequest().body("File is empty");
 		}
 
-		String contentType = file.getContentType();
-		if (contentType != null && !isValidFileType(contentType)) {
+		String originalFilename = file.getOriginalFilename();
+		if (originalFilename != null && !isValidFileType(originalFilename)) {
 			return ResponseEntity.badRequest().body("Invalid file type");
 		}
+
 		return ResponseEntity.ok("File uploaded successfully");
 	}
 
-	private boolean isValidFileType(String contentType) {
-		return contentType.equals("application/vnd.ms-excel")
-				|| contentType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-				|| contentType.equals("text/csv") || contentType.startsWith("text/");
+	private boolean isValidFileType(String fileName) {
+		String fileExtension = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+		return Set.of("csv", "xls", "xlsx", "txt").contains(fileExtension);
 	}
+
 }
