@@ -20,8 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.altimetrik.transactionprocessing.utils.TestTransactionProcessingConstants;
 import com.altimetrik.transactionprocessingtdd.service.TransactionService;
+import com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionControllerTest {

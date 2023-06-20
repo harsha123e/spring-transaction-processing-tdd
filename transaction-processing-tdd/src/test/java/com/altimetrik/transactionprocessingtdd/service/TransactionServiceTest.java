@@ -20,12 +20,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
-import com.altimetrik.transactionprocessing.utils.TestTransactionProcessingConstants;
 import com.altimetrik.transactionprocessingtdd.model.CardTransaction;
 import com.altimetrik.transactionprocessingtdd.model.WalletTransaction;
 import com.altimetrik.transactionprocessingtdd.repository.CardTransactionRepository;
 import com.altimetrik.transactionprocessingtdd.repository.WalletTransactionRepository;
 import com.altimetrik.transactionprocessingtdd.service.impl.TransactionServiceImpl;
+import com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionServiceTest {
