@@ -18,7 +18,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.altimetrik.transactionprocessing.utils.TestTransactionProcessingConstants;
 import com.altimetrik.transactionprocessingtdd.service.TransactionService;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,7 +35,7 @@ class TransactionControllerTest {
 	@Test
 	@DisplayName("Valid csv file upload")
 	public void testUploadFile_WithValidCSVFile_ReturnsSuccessResponse() throws Exception {
-		String filePath = System.getProperty("user.dir") + "/src/test/resources/transactions.csv";
+		String filePath = TestTransactionProcessingConstants.CSV_FILE_RESOURCE;
 
 		String controllerParam = "file";
 		String originalFileName = "transactions.csv";
@@ -45,14 +47,14 @@ class TransactionControllerTest {
 		ResponseEntity<String> response = transactionController.uploadFile(file);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals("File uploaded successfully", response.getBody());
+		assertEquals(TestTransactionProcessingConstants.FILE_UPLOAD_SUCCESSFUL, response.getBody());
 
 	}
 
 	@Test
 	@DisplayName("Valid excel file upload")
 	public void testUploadFile_WithValidExcelFile_ReturnsSuccessResponse() throws Exception {
-		String filePath = System.getProperty("user.dir") + "/src/test/resources/transactions.xlsx";
+		String filePath = TestTransactionProcessingConstants.EXCEL_FILE_RESOURCE;
 
 		String controllerParam = "file";
 		String originalFileName = "transactions.xlsx";
@@ -64,14 +66,14 @@ class TransactionControllerTest {
 		ResponseEntity<String> response = transactionController.uploadFile(file);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals("File uploaded successfully", response.getBody());
+		assertEquals(TestTransactionProcessingConstants.FILE_UPLOAD_SUCCESSFUL, response.getBody());
 
 	}
 
 	@Test
 	@DisplayName("Valid text file upload")
 	public void testUploadFile_WithValidTextFile_ReturnsSuccessResponse() throws Exception {
-		String filePath = System.getProperty("user.dir") + "/src/test/resources/transactions.txt";
+		String filePath = TestTransactionProcessingConstants.TEXT_FILE_RESOURCE;
 
 		String controllerParam = "file";
 		String originalFileName = "transactions.txt";
@@ -83,14 +85,14 @@ class TransactionControllerTest {
 		ResponseEntity<String> response = transactionController.uploadFile(file);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals("File uploaded successfully", response.getBody());
+		assertEquals(TestTransactionProcessingConstants.FILE_UPLOAD_SUCCESSFUL, response.getBody());
 
 	}
 
 	@Test
 	@DisplayName("Invalid file upload")
 	public void testUploadFile_WithInvalidFileType_ReturnsBadRequest() throws Exception {
-		String filePath = System.getProperty("user.dir") + "/src/test/resources/invalid_file.pdf";
+		String filePath = TestTransactionProcessingConstants.TEST_FILE_RESOURCES + "/invalid_file.pdf";
 
 		String controllerParam = "file";
 		String originalFileName = "invalid_file.pdf";
@@ -114,7 +116,7 @@ class TransactionControllerTest {
 		ResponseEntity<String> response = transactionController.uploadFile(file);
 
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-		assertEquals("File is empty", response.getBody());
+		assertEquals(TestTransactionProcessingConstants.FILE_IS_EMPTY, response.getBody());
 
 	}
 
@@ -125,13 +127,13 @@ class TransactionControllerTest {
 				"file content".getBytes());
 
 		doAnswer(invocation -> {
-			throw new IOException("Unable to access file");
-		}).when(transactionService).processAndSaveTransactions(any(byte[].class));
+			throw new IOException(TestTransactionProcessingConstants.FILE_PROCESSING_ERROR);
+		}).when(transactionService).processAndSaveTransactions(any(MultipartFile.class));
 
 		ResponseEntity<String> response = transactionController.uploadFile(file);
 
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-		assertEquals("Unable to access file", response.getBody());
+		assertEquals(TestTransactionProcessingConstants.FILE_PROCESSING_ERROR, response.getBody());
 	}
 
 }
