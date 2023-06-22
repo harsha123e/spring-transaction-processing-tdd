@@ -4,9 +4,8 @@ import java.time.format.DateTimeFormatter;
 
 public class TestTransactionProcessingConstants {
 	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-	public static final DateTimeFormatter DATE_FORMATTER_EXCEL = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-	public static final String UNSUPPORTED_FILE_FORMAT = "Unsupported file format";
-	public static final String FILE_PROCESSING_ERROR = "Error while processing the file";
+	public static final String INVALID_FILE_NAME_ERROR = "Invalid file name";
+	public static final String INVALID_FILE_EXTENSION = "Invalid file extension : ";
 	public static final String EXCEL_EXTENSION = "xlsx";
 	public static final String CSV_EXTENSION = "csv";
 	public static final String FIXEDLENGTHFILEFORMAT_EXTENSION = "txt";

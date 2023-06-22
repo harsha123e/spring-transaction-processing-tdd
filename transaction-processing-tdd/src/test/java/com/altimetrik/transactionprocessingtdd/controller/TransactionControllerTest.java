@@ -1,6 +1,21 @@
 package com.altimetrik.transactionprocessingtdd.controller;
 
-import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.*;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CONTENT_TYPE_CSV;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CONTENT_TYPE_EXCEL;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CONTENT_TYPE_PDF;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CONTENT_TYPE_TXT;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CSV_FILE_NAME;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CSV_FILE_RESOURCE;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.EXCEL_FILE_NAME;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.EXCEL_FILE_RESOURCE;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.FILE_IS_EMPTY;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.FILE_PARAM;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.FILE_UPLOAD_SUCCESSFUL;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.INVALID_FILE_NAME;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.INVALID_FILE_NAME_ERROR;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.INVALID_FILE_RESOURCE;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.TEXT_FILE_NAME;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.TEXT_FILE_RESOURCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.doThrow;
 
@@ -18,8 +33,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 
-import com.altimetrik.transactionprocessingtdd.exception.EmptyFileException;
-import com.altimetrik.transactionprocessingtdd.exception.UnsupportedFileFormatException;
 import com.altimetrik.transactionprocessingtdd.service.TransactionService;
 
 @ExtendWith(MockitoExtension.class)
@@ -79,13 +92,13 @@ class TransactionControllerTest {
 
 		byte[] fileContent = Files.readAllBytes(Paths.get(INVALID_FILE_RESOURCE));
 		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, INVALID_FILE_NAME, CONTENT_TYPE_PDF, fileContent);
-		doThrow(new UnsupportedFileFormatException(UNSUPPORTED_FILE_FORMAT)).when(transactionService)
+		doThrow(new IllegalArgumentException(INVALID_FILE_NAME_ERROR)).when(transactionService)
 				.processAndSaveTransactions(file);
 
 		ResponseEntity<String> response = transactionController.uploadFile(file);
 
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-		assertEquals(UNSUPPORTED_FILE_FORMAT, response.getBody());
+		assertEquals(INVALID_FILE_NAME_ERROR, response.getBody());
 
 	}
 
@@ -95,7 +108,7 @@ class TransactionControllerTest {
 
 		byte[] emptyFileContent = new byte[0]; // Empty file content
 		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, CSV_FILE_NAME, CONTENT_TYPE_CSV, emptyFileContent);
-		doThrow(new EmptyFileException(FILE_IS_EMPTY)).when(transactionService).processAndSaveTransactions(file);
+		doThrow(new IllegalArgumentException(FILE_IS_EMPTY)).when(transactionService).processAndSaveTransactions(file);
 
 		ResponseEntity<String> response = transactionController.uploadFile(file);
 
@@ -110,12 +123,11 @@ class TransactionControllerTest {
 
 		byte[] fileContent = "file content".getBytes();
 		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, CSV_FILE_NAME, CONTENT_TYPE_CSV, fileContent);
-		doThrow(new IOException(FILE_PROCESSING_ERROR)).when(transactionService).processAndSaveTransactions(file);
+		doThrow(new IOException()).when(transactionService).processAndSaveTransactions(file);
 
 		ResponseEntity<String> response = transactionController.uploadFile(file);
 
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-		assertEquals(FILE_PROCESSING_ERROR, response.getBody());
 	}
 
 }

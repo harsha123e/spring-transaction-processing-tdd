@@ -7,9 +7,10 @@ import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessin
 import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.EXCEL_EXTENSION;
 import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.FILE_IS_EMPTY;
 import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.FIXEDLENGTHFILEFORMAT_EXTENSION;
+import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.INVALID_FILE_EXTENSION;
+import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.INVALID_FILE_NAME;
 import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.TRANSACTIONTYPE_CARD;
 import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.TRANSACTIONTYPE_WALLET;
-import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.UNSUPPORTED_FILE_FORMAT;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,8 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.altimetrik.transactionprocessingtdd.exception.EmptyFileException;
-import com.altimetrik.transactionprocessingtdd.exception.UnsupportedFileFormatException;
 import com.altimetrik.transactionprocessingtdd.model.CardTransaction;
 import com.altimetrik.transactionprocessingtdd.model.WalletTransaction;
 import com.altimetrik.transactionprocessingtdd.repository.CardTransactionRepository;
@@ -46,16 +45,15 @@ public class TransactionServiceImpl implements TransactionService {
 	private WalletTransactionRepository walletTransactionRepository;
 
 	@Override
-	public void processAndSaveTransactions(MultipartFile file)
-			throws EmptyFileException, UnsupportedFileFormatException, IOException {
+	public void processAndSaveTransactions(MultipartFile file) throws IOException {
 
 		if (file.isEmpty()) {
-			throw new EmptyFileException(FILE_IS_EMPTY);
+			throw new IllegalArgumentException(FILE_IS_EMPTY);
 		}
 
 		String filename = file.getOriginalFilename();
 		if (filename == null) {
-			throw new UnsupportedFileFormatException(UNSUPPORTED_FILE_FORMAT);
+			throw new IllegalArgumentException(INVALID_FILE_NAME);
 		}
 
 		String fileExtension = getFileExtension(filename);
@@ -70,7 +68,7 @@ public class TransactionServiceImpl implements TransactionService {
 			processFixedLengthFile(file);
 			break;
 		default:
-			throw new UnsupportedFileFormatException(UNSUPPORTED_FILE_FORMAT);
+			throw new IllegalArgumentException(INVALID_FILE_EXTENSION);
 		}
 
 	}
