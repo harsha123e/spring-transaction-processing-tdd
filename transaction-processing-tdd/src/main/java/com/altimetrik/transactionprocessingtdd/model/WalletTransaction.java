@@ -2,16 +2,29 @@ package com.altimetrik.transactionprocessingtdd.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Entity
 public class WalletTransaction {
 
 	@Id
 	private String transactionId;
+
+	@NotBlank(message = "Wallet type is required")
 	private String walletType;
+
+	@NotBlank(message = "UPI Id is required")
 	private String upiId;
+
+	@DecimalMin(value = "0.01", message = "Amount must be greater than or equal to 0.01")
 	private double balance;
+
+	@DecimalMin(value = "0.01", message = "Amount must be greater than or equal to 0.01")
 	private double amount;
+
+	@Size(max = 100, message = "Remarks must be at most 100 characters")
 	private String remarks;
 
 	public WalletTransaction() {

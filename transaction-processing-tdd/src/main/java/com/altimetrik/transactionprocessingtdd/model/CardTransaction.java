@@ -4,16 +4,29 @@ import java.time.LocalDate;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Entity
 public class CardTransaction {
 
 	@Id
 	private String transactionId;
+
+	@NotBlank(message = "Card number is required")
 	private String cardNumber;
+
 	private LocalDate expiryDate;
+
+	@Min(value = 100, message = "CVV must be at least 100")
 	private int cvv;
+
+	@DecimalMin(value = "0.01", message = "Amount must be greater than or equal to 0.01")
 	private double amount;
+
+	@Size(max = 100, message = "Remarks must be at most 100 characters")
 	private String remarks;
 
 	public CardTransaction() {
