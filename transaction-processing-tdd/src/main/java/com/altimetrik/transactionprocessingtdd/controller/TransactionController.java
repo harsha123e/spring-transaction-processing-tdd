@@ -14,8 +14,12 @@ import com.altimetrik.transactionprocessingtdd.service.TransactionService;
 @RestController
 public class TransactionController {
 
-	@Autowired
 	private TransactionService transactionService;
+
+	@Autowired
+	public TransactionController(TransactionService transactionService) {
+		this.transactionService = transactionService;
+	}
 
 	@PostMapping("/upload")
 	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {

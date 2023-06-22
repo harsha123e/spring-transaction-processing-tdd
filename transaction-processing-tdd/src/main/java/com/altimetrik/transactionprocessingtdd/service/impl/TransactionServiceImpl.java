@@ -38,11 +38,15 @@ import com.altimetrik.transactionprocessingtdd.service.TransactionService;
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
-	@Autowired
 	private CardTransactionRepository cardTransactionRepository;
+	private WalletTransactionRepository walletTransactionRepository;
 
 	@Autowired
-	private WalletTransactionRepository walletTransactionRepository;
+	public TransactionServiceImpl(CardTransactionRepository cardTransactionRepository,
+			WalletTransactionRepository walletTransactionRepository) {
+		this.cardTransactionRepository = cardTransactionRepository;
+		this.walletTransactionRepository = walletTransactionRepository;
+	}
 
 	@Override
 	public void processAndSaveTransactions(MultipartFile file) throws IOException {
