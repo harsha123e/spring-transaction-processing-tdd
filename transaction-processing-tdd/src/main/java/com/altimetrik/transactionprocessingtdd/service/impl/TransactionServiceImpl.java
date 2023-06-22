@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.altimetrik.transactionprocessing.utils.TransactionProcessingConstants;
 import com.altimetrik.transactionprocessingtdd.dto.TransactionDto;
 import com.altimetrik.transactionprocessingtdd.exception.FileProcessingException;
 import com.altimetrik.transactionprocessingtdd.exception.InvalidFileNameException;
@@ -26,6 +25,7 @@ import com.altimetrik.transactionprocessingtdd.model.WalletTransaction;
 import com.altimetrik.transactionprocessingtdd.repository.CardTransactionRepository;
 import com.altimetrik.transactionprocessingtdd.repository.WalletTransactionRepository;
 import com.altimetrik.transactionprocessingtdd.service.TransactionService;
+import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.*;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -41,21 +41,21 @@ public class TransactionServiceImpl implements TransactionService {
 			throws IOException, InvalidFileNameException, UnsupportedFileFormatException, FileProcessingException {
 		String filename = file.getOriginalFilename();
 		if (filename == null) {
-			throw new InvalidFileNameException(TransactionProcessingConstants.INVALID_FILE_NAME);
+			throw new InvalidFileNameException(INVALID_FILE_NAME);
 		}
 
 		try {
-			if (filename.endsWith(TransactionProcessingConstants.EXCEL_EXTENSION)) {
+			if (filename.endsWith(EXCEL_EXTENSION)) {
 				processExcelFile(file);
-			} else if (filename.endsWith(TransactionProcessingConstants.CSV_EXTENSION)) {
+			} else if (filename.endsWith(CSV_EXTENSION)) {
 				processCsvFile(file);
-			} else if (filename.endsWith(TransactionProcessingConstants.FIXEDLENGTHFILEFORMAT_EXTENSION)) {
+			} else if (filename.endsWith(FIXEDLENGTHFILEFORMAT_EXTENSION)) {
 				processFixedLengthFile(file);
 			} else {
-				throw new UnsupportedFileFormatException(TransactionProcessingConstants.UNSUPPORTED_FILE_FORMAT);
+				throw new UnsupportedFileFormatException(UNSUPPORTED_FILE_FORMAT);
 			}
 		} catch (FileProcessingException e) {
-			throw new FileProcessingException(TransactionProcessingConstants.FILE_PROCESSING_ERROR + e.getMessage());
+			throw new FileProcessingException(FILE_PROCESSING_ERROR + e.getMessage());
 		}
 
 	}
@@ -85,13 +85,13 @@ public class TransactionServiceImpl implements TransactionService {
 			List<String> lines = reader.lines().skip(1).collect(Collectors.toList()); // Skip the header line
 
 			for (String line : lines) {
-				String[] fields = line.split(TransactionProcessingConstants.CSV_DELIMITER); // Assuming fields are
-																							// comma-separated
+				String[] fields = line.split(CSV_DELIMITER); // Assuming fields are
+																// comma-separated
 				TransactionDto transaction = getTransactionFromFields(fields);
 				saveTransaction(transaction);
 			}
 		} catch (IOException e) {
-			throw new FileProcessingException(TransactionProcessingConstants.FILE_PROCESSING_ERROR + e.getMessage());
+			throw new FileProcessingException(FILE_PROCESSING_ERROR + e.getMessage());
 		}
 	}
 
@@ -104,7 +104,7 @@ public class TransactionServiceImpl implements TransactionService {
 				saveTransaction(transaction);
 			}
 		} catch (IOException e) {
-			throw new FileProcessingException(TransactionProcessingConstants.FILE_PROCESSING_ERROR + e.getMessage());
+			throw new FileProcessingException(FILE_PROCESSING_ERROR + e.getMessage());
 		}
 	}
 
@@ -123,18 +123,16 @@ public class TransactionServiceImpl implements TransactionService {
 		transaction.setAmount(amount);
 		transaction.setRemarks(remarks);
 
-		if (TransactionProcessingConstants.TRANSACTIONTYPE_CARD.equalsIgnoreCase(transaction.getTransactionType())) {
+		if (TRANSACTIONTYPE_CARD.equalsIgnoreCase(transaction.getTransactionType())) {
 
 			String cardNumber = dataFormatter.formatCellValue(row.getCell(2));
-			LocalDate expiryDate = LocalDate.parse(dataFormatter.formatCellValue(row.getCell(3)),
-					TransactionProcessingConstants.DATE_FORMATTER_EXCEL);
+			LocalDate expiryDate = LocalDate.parse(dataFormatter.formatCellValue(row.getCell(3)), DATE_FORMATTER_EXCEL);
 			int cvv = Integer.parseInt(dataFormatter.formatCellValue(row.getCell(4)));
 
 			transaction.setCardNumber(cardNumber);
 			transaction.setExpiryDate(expiryDate);
 			transaction.setCvv(cvv);
-		} else if (TransactionProcessingConstants.TRANSACTIONTYPE_WALLET
-				.equalsIgnoreCase(transaction.getTransactionType())) {
+		} else if (TRANSACTIONTYPE_WALLET.equalsIgnoreCase(transaction.getTransactionType())) {
 
 			String walletType = dataFormatter.formatCellValue(row.getCell(2));
 			String upiId = dataFormatter.formatCellValue(row.getCell(3));
@@ -162,18 +160,17 @@ public class TransactionServiceImpl implements TransactionService {
 		transaction.setAmount(amount);
 		transaction.setRemarks(remarks);
 
-		if (TransactionProcessingConstants.TRANSACTIONTYPE_CARD.equalsIgnoreCase(transaction.getTransactionType())) {
+		if (TRANSACTIONTYPE_CARD.equalsIgnoreCase(transaction.getTransactionType())) {
 
 			String cardNumber = fields[2];
-			LocalDate expiryDate = LocalDate.parse(fields[3], TransactionProcessingConstants.DATE_FORMATTER);
+			LocalDate expiryDate = LocalDate.parse(fields[3], DATE_FORMATTER);
 			int cvv = Integer.parseInt(fields[4]);
 
 			transaction.setCardNumber(cardNumber);
 			transaction.setExpiryDate(expiryDate);
 			transaction.setCvv(cvv);
 
-		} else if (TransactionProcessingConstants.TRANSACTIONTYPE_WALLET
-				.equalsIgnoreCase(transaction.getTransactionType())) {
+		} else if (TRANSACTIONTYPE_WALLET.equalsIgnoreCase(transaction.getTransactionType())) {
 
 			String walletType = fields[2];
 			String upiId = fields[3];
@@ -201,19 +198,17 @@ public class TransactionServiceImpl implements TransactionService {
 		transaction.setAmount(amount);
 		transaction.setRemarks(remarks);
 
-		if (TransactionProcessingConstants.TRANSACTIONTYPE_CARD.equalsIgnoreCase(transaction.getTransactionType())) {
+		if (TRANSACTIONTYPE_CARD.equalsIgnoreCase(transaction.getTransactionType())) {
 
 			String cardNumber = line.substring(26, 39).trim();
 			int cvv = Integer.parseInt(line.substring(40, 43).trim());
-			LocalDate expiryDate = LocalDate.parse(line.substring(44, 54).trim(),
-					TransactionProcessingConstants.DATE_FORMATTER);
+			LocalDate expiryDate = LocalDate.parse(line.substring(44, 54).trim(), DATE_FORMATTER);
 
 			transaction.setCardNumber(cardNumber);
 			transaction.setExpiryDate(expiryDate);
 			transaction.setCvv(cvv);
 
-		} else if (TransactionProcessingConstants.TRANSACTIONTYPE_WALLET
-				.equalsIgnoreCase(transaction.getTransactionType())) {
+		} else if (TRANSACTIONTYPE_WALLET.equalsIgnoreCase(transaction.getTransactionType())) {
 
 			String walletType = line.substring(26, 39).trim();
 			String upiId = line.substring(40, 43).trim();
@@ -230,15 +225,14 @@ public class TransactionServiceImpl implements TransactionService {
 
 	private void saveTransaction(TransactionDto transaction) {
 
-		if (TransactionProcessingConstants.TRANSACTIONTYPE_CARD.equalsIgnoreCase(transaction.getTransactionType())) {
+		if (TRANSACTIONTYPE_CARD.equalsIgnoreCase(transaction.getTransactionType())) {
 
 			CardTransaction newTransaction = new CardTransaction(transaction.getTransactionId(),
 					transaction.getCardNumber(), transaction.getExpiryDate(), transaction.getCvv(),
 					transaction.getAmount(), transaction.getRemarks());
 			cardTransactionRepository.save(newTransaction);
 
-		} else if (TransactionProcessingConstants.TRANSACTIONTYPE_WALLET
-				.equalsIgnoreCase(transaction.getTransactionType())) {
+		} else if (TRANSACTIONTYPE_WALLET.equalsIgnoreCase(transaction.getTransactionType())) {
 
 			WalletTransaction newTransaction = new WalletTransaction(transaction.getTransactionId(),
 					transaction.getWalletType(), transaction.getUpiId(), transaction.getBalance(),
