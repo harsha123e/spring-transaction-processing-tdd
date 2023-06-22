@@ -1,14 +1,23 @@
 package com.altimetrik.transactionprocessingtdd.service;
 
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CONTENT_TYPE_CSV;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CONTENT_TYPE_EXCEL;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CONTENT_TYPE_TXT;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CSV_FILE_NAME;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CSV_FILE_RESOURCE;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.DATE_FORMATTER;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.EXCEL_FILE_NAME;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.EXCEL_FILE_RESOURCE;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.FILE_PARAM;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.TEXT_FILE_NAME;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.TEXT_FILE_RESOURCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -25,7 +34,6 @@ import com.altimetrik.transactionprocessingtdd.model.WalletTransaction;
 import com.altimetrik.transactionprocessingtdd.repository.CardTransactionRepository;
 import com.altimetrik.transactionprocessingtdd.repository.WalletTransactionRepository;
 import com.altimetrik.transactionprocessingtdd.service.impl.TransactionServiceImpl;
-import com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionServiceTest {
@@ -48,60 +56,34 @@ class TransactionServiceTest {
 	@Test
 	public void testProcessAndSaveTransaction_WithCSVFile_StoreTransactionsInDatabase() throws Exception {
 
-		String filePath = TestTransactionProcessingConstants.CSV_FILE_RESOURCE;
-
-		String controllerParam = "file";
-		String originalFileName = "transactions.csv";
-		String contentType = "text/csv";
-		Path path = Paths.get(filePath);
-		byte[] fileContent = Files.readAllBytes(path);
-		MockMultipartFile file = new MockMultipartFile(controllerParam, originalFileName, contentType, fileContent);
-
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+		byte[] fileContent = Files.readAllBytes(Paths.get(CSV_FILE_RESOURCE));
+		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, CSV_FILE_NAME, CONTENT_TYPE_CSV, fileContent);
 
 		transactionService.processAndSaveTransactions(file);
 
 		verify(cardTransactionRepository, times(2)).save(cardTransactionCaptor.capture());
-
 		verify(walletTransactionRepository, times(2)).save(walletTransactionCaptor.capture());
 
-		List<CardTransaction> capturedCardTransactions = cardTransactionCaptor.getAllValues();
-		assertEquals(2, capturedCardTransactions.size());
+		assertEquals(2, cardTransactionCaptor.getAllValues().size());
+		assertEquals(2, walletTransactionCaptor.getAllValues().size());
 
-		CardTransaction cardTransaction1 = capturedCardTransactions.get(0);
-		assertEquals("123424313", cardTransaction1.getTransactionId());
-		assertEquals("876998799879", cardTransaction1.getCardNumber());
-		assertEquals(LocalDate.parse("23-01-2020", formatter), cardTransaction1.getExpiryDate());
-		assertEquals(123, cardTransaction1.getCvv());
-		assertEquals(123.412, cardTransaction1.getAmount());
-		assertEquals("card processing", cardTransaction1.getRemarks());
+		assertCardTransaction(cardTransactionCaptor.getAllValues().get(0), "123424313", "876998799879",
+				LocalDate.parse("23-01-2020", DATE_FORMATTER), 123, 123.412, "card processing");
+		assertCardTransaction(cardTransactionCaptor.getAllValues().get(1), "12346234213", "876998799879",
+				LocalDate.parse("23-01-2020", DATE_FORMATTER), 123, 123.412, "card processing");
 
-		CardTransaction cardTransaction2 = capturedCardTransactions.get(1);
-		assertEquals("12346234213", cardTransaction2.getTransactionId());
-
-		List<WalletTransaction> capturedWalletTransactions = walletTransactionCaptor.getAllValues();
-		assertEquals(2, capturedCardTransactions.size());
-
-		WalletTransaction capturedWalletTransaction1 = capturedWalletTransactions.get(0);
+		WalletTransaction capturedWalletTransaction1 = walletTransactionCaptor.getAllValues().get(0);
 		assertEquals("1234653213", capturedWalletTransaction1.getTransactionId());
 
-		WalletTransaction capturedWalletTransaction2 = capturedWalletTransactions.get(1);
+		WalletTransaction capturedWalletTransaction2 = walletTransactionCaptor.getAllValues().get(1);
 		assertEquals("1265234213", capturedWalletTransaction2.getTransactionId());
 	}
 
 	@Test
 	public void testProcessAndSaveTransaction_WithExcelFile_StoreTransactionsInDatabase() throws Exception {
 
-		String filePath = TestTransactionProcessingConstants.EXCEL_FILE_RESOURCE;
-
-		String controllerParam = "file";
-		String originalFileName = "transactions.xlsx";
-		String contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-		Path path = Paths.get(filePath);
-		byte[] fileContent = Files.readAllBytes(path);
-		MockMultipartFile file = new MockMultipartFile(controllerParam, originalFileName, contentType, fileContent);
-
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+		byte[] fileContent = Files.readAllBytes(Paths.get(EXCEL_FILE_RESOURCE));
+		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, EXCEL_FILE_NAME, CONTENT_TYPE_EXCEL, fileContent);
 
 		transactionService.processAndSaveTransactions(file);
 
@@ -109,41 +91,26 @@ class TransactionServiceTest {
 
 		verify(walletTransactionRepository, times(2)).save(walletTransactionCaptor.capture());
 
-		List<CardTransaction> capturedCardTransactions = cardTransactionCaptor.getAllValues();
-		assertEquals(2, capturedCardTransactions.size());
+		assertEquals(2, cardTransactionCaptor.getAllValues().size());
+		assertEquals(2, walletTransactionCaptor.getAllValues().size());
 
-		CardTransaction cardTransaction1 = capturedCardTransactions.get(0);
-		assertEquals("123424313", cardTransaction1.getTransactionId());
-		assertEquals("876998799879", cardTransaction1.getCardNumber());
-		assertEquals(LocalDate.parse("23-01-2020", formatter), cardTransaction1.getExpiryDate());
-		assertEquals(123, cardTransaction1.getCvv());
-		assertEquals(123.412, cardTransaction1.getAmount());
-		assertEquals("card processing", cardTransaction1.getRemarks());
+		assertCardTransaction(cardTransactionCaptor.getAllValues().get(0), "123424313", "876998799879",
+				LocalDate.parse("23-01-2020", DATE_FORMATTER), 123, 123.412, "card processing");
+		assertCardTransaction(cardTransactionCaptor.getAllValues().get(1), "12346234213", "876998799879",
+				LocalDate.parse("24-01-2020", DATE_FORMATTER), 124, 124.412, "card processing");
 
-		CardTransaction cardTransaction2 = capturedCardTransactions.get(1);
-		assertEquals("12346234213", cardTransaction2.getTransactionId());
-
-		List<WalletTransaction> capturedWalletTransactions = walletTransactionCaptor.getAllValues();
-		assertEquals(2, capturedCardTransactions.size());
-
-		WalletTransaction capturedWalletTransaction1 = capturedWalletTransactions.get(0);
+		WalletTransaction capturedWalletTransaction1 = walletTransactionCaptor.getAllValues().get(0);
 		assertEquals("1234653213", capturedWalletTransaction1.getTransactionId());
 
-		WalletTransaction capturedWalletTransaction2 = capturedWalletTransactions.get(1);
+		WalletTransaction capturedWalletTransaction2 = walletTransactionCaptor.getAllValues().get(1);
 		assertEquals("1265234213", capturedWalletTransaction2.getTransactionId());
 	}
 
 	@Test
 	public void testProcessAndSaveTransaction_WithFixedFormatLengthFile_StoreTransactionsInDatabase() throws Exception {
 
-		String filePath = TestTransactionProcessingConstants.TEXT_FILE_RESOURCE;
-
-		String controllerParam = "file";
-		String originalFileName = "transactions.txt";
-		String contentType = "text/plain;charset=UTF-8";
-		Path path = Paths.get(filePath);
-		byte[] fileContent = Files.readAllBytes(path);
-		MockMultipartFile file = new MockMultipartFile(controllerParam, originalFileName, contentType, fileContent);
+		byte[] fileContent = Files.readAllBytes(Paths.get(TEXT_FILE_RESOURCE));
+		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, TEXT_FILE_NAME, CONTENT_TYPE_TXT, fileContent);
 
 		transactionService.processAndSaveTransactions(file);
 
@@ -162,6 +129,16 @@ class TransactionServiceTest {
 
 		WalletTransaction capturedWalletTransaction = walletTransactionCaptor.getValue();
 		assertEquals("9876543212", capturedWalletTransaction.getTransactionId());
+	}
+
+	private void assertCardTransaction(CardTransaction cardTransaction, String transactionId, String cardNumber,
+			LocalDate expiryDate, int cvv, double amount, String remarks) {
+		assertEquals(transactionId, cardTransaction.getTransactionId());
+		assertEquals(cardNumber, cardTransaction.getCardNumber());
+		assertEquals(expiryDate, cardTransaction.getExpiryDate());
+		assertEquals(cvv, cardTransaction.getCvv());
+		assertEquals(amount, cardTransaction.getAmount());
+		assertEquals(remarks, cardTransaction.getRemarks());
 	}
 
 }
