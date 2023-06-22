@@ -1,4 +1,4 @@
-package com.altimetrik.transactionprocessingtdd.service;
+package com.altimetrik.transactionprocessingtdd.service.impl;
 
 import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CONTENT_TYPE_CSV;
 import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CONTENT_TYPE_EXCEL;
@@ -33,10 +33,9 @@ import com.altimetrik.transactionprocessingtdd.model.CardTransaction;
 import com.altimetrik.transactionprocessingtdd.model.WalletTransaction;
 import com.altimetrik.transactionprocessingtdd.repository.CardTransactionRepository;
 import com.altimetrik.transactionprocessingtdd.repository.WalletTransactionRepository;
-import com.altimetrik.transactionprocessingtdd.service.impl.TransactionServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
-class TransactionServiceTest {
+class TransactionServiceTest2 {
 
 	@Mock
 	private CardTransactionRepository cardTransactionRepository;
