@@ -8,9 +8,9 @@ public class TransactionProcessingConstants {
 	public static final String INVALID_FILE_NAME = "Invalid file name";
 	public static final String UNSUPPORTED_FILE_FORMAT = "Unsupported file format";
 	public static final String FILE_PROCESSING_ERROR = "Error while processing the file";
-	public static final String EXCEL_EXTENSION = ".xlsx";
-	public static final String CSV_EXTENSION = ".csv";
-	public static final String FIXEDLENGTHFILEFORMAT_EXTENSION = ".txt";
+	public static final String EXCEL_EXTENSION = "xlsx";
+	public static final String CSV_EXTENSION = "csv";
+	public static final String FIXEDLENGTHFILEFORMAT_EXTENSION = "txt";
 	public static final String TRANSACTIONTYPE_CARD = "card";
 	public static final String TRANSACTIONTYPE_WALLET = "wallet";
 	public static final String CSV_DELIMITER = ",";
