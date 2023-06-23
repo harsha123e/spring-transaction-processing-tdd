@@ -1,6 +1,6 @@
 package com.altimetrik.transactionprocessingtdd.service.impl;
 
-import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.CSV_DELIMITER;
+import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.*;
 import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.DATE_FORMATTER;
 import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.TRANSACTIONTYPE_CARD;
 import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.TRANSACTIONTYPE_WALLET;
@@ -37,6 +37,11 @@ public class CsvTransactionProcessorImpl implements TransactionProcessor {
 
 	@Override
 	public void processTransactions(MultipartFile file) throws IOException {
+
+		if (file == null) {
+			throw new IllegalArgumentException(FILE_IS_EMPTY);
+		}
+
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
 
 			reader.lines().skip(1).forEach(this::saveTransactionFromCSV);
