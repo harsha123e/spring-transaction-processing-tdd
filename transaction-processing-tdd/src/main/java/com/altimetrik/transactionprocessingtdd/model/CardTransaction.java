@@ -30,7 +30,6 @@ public class CardTransaction {
 	private String remarks;
 
 	public CardTransaction() {
-		super();
 	}
 
 	public CardTransaction(String transactionId, String cardNumber, LocalDate expiryDate, int cvv, double amount,

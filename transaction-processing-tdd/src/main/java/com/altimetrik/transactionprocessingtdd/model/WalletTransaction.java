@@ -28,7 +28,6 @@ public class WalletTransaction {
 	private String remarks;
 
 	public WalletTransaction() {
-		super();
 	}
 
 	public WalletTransaction(String transactionId, String walletType, String upiId, double balance, double amount,
