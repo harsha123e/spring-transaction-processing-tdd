@@ -32,9 +32,9 @@ public class DefaultTransactionProcessorFactory implements TransactionProcessorF
 		}
 
 		switch (fileExtension) {
-		case EXCEL_EXTENSION:
-			return csvTransactionProcessor;
 		case CSV_EXTENSION:
+			return csvTransactionProcessor;
+		case EXCEL_EXTENSION:
 			return excelTransactionProcessor;
 		case FIXEDLENGTHFILEFORMAT_EXTENSION:
 			return fixedFileLengthTransactionProcessor;
