@@ -5,9 +5,12 @@ import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProce
 import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.FILE_PARAM;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
@@ -17,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.altimetrik.transactionprocessingtdd.model.CardTransaction;
@@ -32,6 +36,9 @@ class CsvTransactionProcessorImplTest {
 
 	@Mock
 	private WalletTransactionRepository walletTransactionRepository;
+
+	@Mock
+	private ModelMapper mapper;
 
 	@InjectMocks
 	private CsvTransactionProcessorImpl csvTransactionProcessor;
@@ -66,9 +73,44 @@ class CsvTransactionProcessorImplTest {
 		byte[] fileContent = csvData.getBytes();
 		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, CSV_FILE_NAME, CONTENT_TYPE_CSV, fileContent);
 
+		when(mapper.map(any(String[].class), eq(CardTransaction.class))).thenReturn(mock(CardTransaction.class));
+		when(mapper.map(any(String[].class), eq(WalletTransaction.class))).thenReturn(mock(WalletTransaction.class));
+
 		csvTransactionProcessor.processTransactions(file);
 
 		verify(cardTransactionRepository, times(1)).save(any(CardTransaction.class));
 		verify(walletTransactionRepository, times(1)).save(any(WalletTransaction.class));
+	}
+
+	@Test
+	@DisplayName("If file has invalid transactions - skip transactions")
+	void shouldSkipInvalidTransactionInFile() throws IOException {
+		String csvData = "transaction id,type,card number/wallettype,expiry date/upi id,cvv/balance,amount,remarks\n"
+				+ "1,card,12-12-2023,123,100.0,Card Transaction\n"
+				+ "2,wallet,digi-wallet,paytm@user,456.00,Wallet Transaction\n";
+
+		byte[] fileContent = csvData.getBytes();
+		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, CSV_FILE_NAME, CONTENT_TYPE_CSV, fileContent);
+
+		csvTransactionProcessor.processTransactions(file);
+
+		verify(cardTransactionRepository, never()).save(any(CardTransaction.class));
+		verify(walletTransactionRepository, never()).save(any(WalletTransaction.class));
+	}
+
+	@Test
+	@DisplayName("If file has invalid numeric transactions - skip transactions")
+	void shouldSkipInValidTransactionWithIncorrectNumericValuesInFile() throws IOException {
+		String csvData = "transaction id,type,card number/wallettype,expiry date/upi id,cvv/balance,amount,remarks\n"
+				+ "1,card,1234567890123456,12-12-2023,123asd,10df0.0,Card Transaction\n"
+				+ "2,wallet,digi-wallet,paytm@user,4fd56.00,2sdf00.0,Wallet Transaction\n";
+
+		byte[] fileContent = csvData.getBytes();
+		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, CSV_FILE_NAME, CONTENT_TYPE_CSV, fileContent);
+
+		csvTransactionProcessor.processTransactions(file);
+
+		verify(cardTransactionRepository, never()).save(any(CardTransaction.class));
+		verify(walletTransactionRepository, never()).save(any(WalletTransaction.class));
 	}
 }
