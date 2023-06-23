@@ -15,7 +15,7 @@ public class TransactionProcessingConstants {
 	public static final String FIXEDLENGTHFILEFORMAT_EXTENSION = "txt";
 	public static final String CONTENT_TYPE_CSV = "text/csv";
 	public static final String CONTENT_TYPE_EXCEL = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-	public static final String CONTENT_TYPE_TEXT = "text/plain;charset=UTF-8";
+	public static final String CONTENT_TYPE_TEXT = "text/plain";
 	public static final String TRANSACTIONTYPE_CARD = "card";
 	public static final String TRANSACTIONTYPE_WALLET = "wallet";
 	public static final String CSV_DELIMITER = ",";

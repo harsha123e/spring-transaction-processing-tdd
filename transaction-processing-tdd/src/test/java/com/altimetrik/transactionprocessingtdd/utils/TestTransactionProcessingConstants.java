@@ -21,7 +21,7 @@ public class TestTransactionProcessingConstants {
 	public static final String INVALID_FILE_NAME = "invalid_file.pdf";
 	public static final String CONTENT_TYPE_CSV = "text/csv";
 	public static final String CONTENT_TYPE_EXCEL = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-	public static final String CONTENT_TYPE_TEXT = "text/plain;charset=UTF-8";
+	public static final String CONTENT_TYPE_TEXT = "text/plain";
 	public static final String CONTENT_TYPE_PDF = "application/pdf";
 	public static final String FILE_PARAM = "file";
 	public static final String TEST_RESOURCE = System.getProperty("user.dir") + "\\src\\test\\resources\\";

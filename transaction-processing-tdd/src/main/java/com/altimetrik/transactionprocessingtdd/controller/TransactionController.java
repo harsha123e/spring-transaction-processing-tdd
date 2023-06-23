@@ -41,7 +41,8 @@ public class TransactionController {
 			return ResponseEntity.badRequest().body(INVALID_FILE_EXTENSION + fileExtension);
 		}
 
-		if (!FileUtil.isFileTypeMatching(filename, file.getContentType())) {
+		String contentType = file.getContentType();
+		if (!FileUtil.isFileTypeMatching(filename, contentType)) {
 			return ResponseEntity.badRequest().body(INVALID_FILE_TYPE);
 		}
 
