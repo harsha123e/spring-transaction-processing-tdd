@@ -26,10 +26,15 @@ public class DefaultTransactionProcessorFactory implements TransactionProcessorF
 
 	@Override
 	public TransactionProcessor getTransactionProcessor(String fileExtension) {
+
+		if (fileExtension == null) {
+			throw new IllegalArgumentException("Unsupported file extension: " + fileExtension);
+		}
+
 		switch (fileExtension) {
-		case CSV_EXTENSION:
-			return csvTransactionProcessor;
 		case EXCEL_EXTENSION:
+			return csvTransactionProcessor;
+		case CSV_EXTENSION:
 			return excelTransactionProcessor;
 		case FIXEDLENGTHFILEFORMAT_EXTENSION:
 			return fixedFileLengthTransactionProcessor;
