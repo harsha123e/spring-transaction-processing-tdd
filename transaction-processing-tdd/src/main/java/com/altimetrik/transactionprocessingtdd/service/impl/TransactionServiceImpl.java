@@ -1,7 +1,6 @@
 package com.altimetrik.transactionprocessingtdd.service.impl;
 
-import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.FILE_IS_EMPTY;
-import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.INVALID_FILE_NAME;
+import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.*;
 
 import java.io.IOException;
 
@@ -9,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.altimetrik.transactionprocessingtdd.service.TransactionProcessor;
 import com.altimetrik.transactionprocessingtdd.service.TransactionProcessorFactory;
 import com.altimetrik.transactionprocessingtdd.service.TransactionService;
+import com.altimetrik.transactionprocessingtdd.utils.FileUtil;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -23,25 +24,21 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
 	@Override
-	public void processAndSaveTransactions(MultipartFile file) throws IOException {
+	public void processAndSaveTransactions(MultipartFile file, String fileExtension) throws IOException {
 
-		if (file.isEmpty()) {
+		if (file == null) {
 			throw new IllegalArgumentException(FILE_IS_EMPTY);
 		}
-
-		String filename = file.getOriginalFilename();
-		if (filename == null) {
-			throw new IllegalArgumentException(INVALID_FILE_NAME);
+		if (fileExtension == null || fileExtension.isEmpty() || fileExtension.isBlank()
+				|| !FileUtil.isValidExtension(fileExtension)) {
+			throw new IllegalArgumentException(INVALID_FILE_EXTENSION);
 		}
-
-		String fileExtension = getFileExtension(filename);
-		transactionProcessorFactory.getTransactionProcessor(fileExtension).processTransactions(file);
+		TransactionProcessor transactionProcessor = transactionProcessorFactory.getTransactionProcessor(fileExtension);
+		if (transactionProcessor == null) {
+			throw new IllegalArgumentException(NO_SUCH_TRANSACTION_PROCESSOR + fileExtension);
+		}
+		transactionProcessor.processTransactions(file);
 
 	}
 
-	private String getFileExtension(String filename) {
-		int extensionIndex = filename.lastIndexOf('.');
-		return (extensionIndex >= 0 && extensionIndex < filename.length() - 1) ? filename.substring(extensionIndex + 1)
-				: "";
-	}
 }

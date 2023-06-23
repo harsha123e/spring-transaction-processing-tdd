@@ -5,5 +5,6 @@ import java.io.IOException;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface TransactionService {
-	public void processAndSaveTransactions(MultipartFile file) throws IOException;
+
+	void processAndSaveTransactions(MultipartFile file, String fileExtension) throws IOException;
 }
