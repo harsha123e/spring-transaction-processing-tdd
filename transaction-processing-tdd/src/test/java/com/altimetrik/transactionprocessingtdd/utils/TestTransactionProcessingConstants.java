@@ -2,8 +2,6 @@ package com.altimetrik.transactionprocessingtdd.utils;
 
 import java.time.format.DateTimeFormatter;
 
-import org.apache.catalina.User;
-
 public class TestTransactionProcessingConstants {
 	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 	public static final String INVALID_FILE_NAME_ERROR = "Invalid file name";

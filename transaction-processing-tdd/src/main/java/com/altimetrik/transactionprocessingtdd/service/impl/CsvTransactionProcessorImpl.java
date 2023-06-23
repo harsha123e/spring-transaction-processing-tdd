@@ -1,6 +1,10 @@
 package com.altimetrik.transactionprocessingtdd.service.impl;
 
-import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.*;
+import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.CSV_DELIMITER;
+import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.DATE_FORMATTER;
+import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.FILE_IS_EMPTY;
+import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.TRANSACTIONTYPE_CARD;
+import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.TRANSACTIONTYPE_WALLET;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,7 +12,6 @@ import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -26,15 +29,13 @@ public class CsvTransactionProcessorImpl implements TransactionProcessor {
 
 	private CardTransactionRepository cardTransactionRepository;
 	private WalletTransactionRepository walletTransactionRepository;
-	private ModelMapper mapper;
 
 	@Autowired
 	public CsvTransactionProcessorImpl(CardTransactionRepository cardTransactionRepository,
-			WalletTransactionRepository walletTransactionRepository, ModelMapper mapper) {
+			WalletTransactionRepository walletTransactionRepository) {
 		super();
 		this.cardTransactionRepository = cardTransactionRepository;
 		this.walletTransactionRepository = walletTransactionRepository;
-		this.mapper = mapper;
 	}
 
 	@Override
@@ -110,12 +111,15 @@ public class CsvTransactionProcessorImpl implements TransactionProcessor {
 	}
 
 	private void saveWalletTransaction(String[] fields) {
-		WalletTransaction walletTransaction = mapper.map(fields, WalletTransaction.class);
+		WalletTransaction walletTransaction = new WalletTransaction(fields[0], fields[2], fields[3],
+				Double.parseDouble(fields[4]), Double.parseDouble(fields[5]), fields[6]);
 		walletTransactionRepository.save(walletTransaction);
 	}
 
 	private void saveCardTransaction(String[] fields) {
-		CardTransaction cardTransaction = mapper.map(fields, CardTransaction.class);
+		CardTransaction cardTransaction = new CardTransaction(fields[0], fields[2],
+				LocalDate.parse(fields[3], DATE_FORMATTER), Integer.parseInt(fields[4]), Double.parseDouble(fields[5]),
+				fields[6]);
 		cardTransactionRepository.save(cardTransaction);
 	}
 }

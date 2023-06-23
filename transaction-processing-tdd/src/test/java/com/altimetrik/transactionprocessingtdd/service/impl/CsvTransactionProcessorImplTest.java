@@ -5,12 +5,9 @@ import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProce
 import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.FILE_PARAM;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 
@@ -20,7 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.altimetrik.transactionprocessingtdd.model.CardTransaction;
@@ -36,9 +32,6 @@ class CsvTransactionProcessorImplTest {
 
 	@Mock
 	private WalletTransactionRepository walletTransactionRepository;
-
-	@Mock
-	private ModelMapper mapper;
 
 	@InjectMocks
 	private CsvTransactionProcessorImpl csvTransactionProcessor;
@@ -72,9 +65,6 @@ class CsvTransactionProcessorImplTest {
 
 		byte[] fileContent = csvData.getBytes();
 		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, CSV_FILE_NAME, CONTENT_TYPE_CSV, fileContent);
-
-		when(mapper.map(any(String[].class), eq(CardTransaction.class))).thenReturn(mock(CardTransaction.class));
-		when(mapper.map(any(String[].class), eq(WalletTransaction.class))).thenReturn(mock(WalletTransaction.class));
 
 		csvTransactionProcessor.processTransactions(file);
 
