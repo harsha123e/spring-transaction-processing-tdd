@@ -1,8 +1,6 @@
 package com.altimetrik.transactionprocessingtdd.service.impl;
 
-import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.DATE_FORMATTER_EXCEL;
-import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.TRANSACTIONTYPE_CARD;
-import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.TRANSACTIONTYPE_WALLET;
+import static com.altimetrik.transactionprocessingtdd.utils.TransactionProcessingConstants.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -42,6 +40,11 @@ public class ExcelTransactionProcessorImpl implements TransactionProcessor {
 
 	@Override
 	public void processTransactions(MultipartFile file) throws IOException {
+
+		if (file == null || file.isEmpty()) {
+			throw new IllegalArgumentException(FILE_IS_EMPTY);
+		}
+
 		try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 			Sheet sheet = workbook.getSheetAt(0); // Assuming there is only one sheet
 			Stream<Row> rowStream = StreamSupport.stream(sheet.spliterator(), false);
