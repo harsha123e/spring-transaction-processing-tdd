@@ -2,6 +2,8 @@ package com.altimetrik.transactionprocessingtdd.utils;
 
 import java.time.format.DateTimeFormatter;
 
+import org.apache.catalina.User;
+
 public class TestTransactionProcessingConstants {
 	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 	public static final String INVALID_FILE_NAME_ERROR = "Invalid file name";
@@ -22,4 +24,5 @@ public class TestTransactionProcessingConstants {
 	public static final String CONTENT_TYPE_TEXT = "text/plain;charset=UTF-8";
 	public static final String CONTENT_TYPE_PDF = "application/pdf";
 	public static final String FILE_PARAM = "file";
+	public static final String TEST_RESOURCE = System.getProperty("user.dir") + "\\src\\test\\resources\\";
 }
