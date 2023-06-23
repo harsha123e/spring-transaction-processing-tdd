@@ -2,30 +2,34 @@ package com.altimetrik.transactionprocessingtdd.controller;
 
 import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CONTENT_TYPE_CSV;
 import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CONTENT_TYPE_EXCEL;
-import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CONTENT_TYPE_PDF;
-import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CONTENT_TYPE_TXT;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CONTENT_TYPE_TEXT;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CSV_EXTENSION;
 import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CSV_FILE_NAME;
-import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.CSV_FILE_RESOURCE;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.EXCEL_EXTENSION;
 import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.EXCEL_FILE_NAME;
-import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.EXCEL_FILE_RESOURCE;
 import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.FILE_IS_EMPTY;
 import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.FILE_PARAM;
 import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.FILE_UPLOAD_SUCCESSFUL;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.FIXEDLENGTHFILEFORMAT_EXTENSION;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.INVALID_FILE_EXTENSION;
 import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.INVALID_FILE_NAME;
 import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.INVALID_FILE_NAME_ERROR;
-import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.INVALID_FILE_RESOURCE;
+import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.INVALID_FILE_TYPE;
 import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.TEXT_FILE_NAME;
-import static com.altimetrik.transactionprocessingtdd.utils.TestTransactionProcessingConstants.TEXT_FILE_RESOURCE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -44,90 +48,92 @@ class TransactionControllerTest {
 	@InjectMocks
 	private TransactionController transactionController;
 
-	@Test
-	@DisplayName("Valid csv file upload")
-	public void testUploadFile_WithValidCSVFile_ReturnsSuccessResponse() throws IOException {
-
-		byte[] fileContent = Files.readAllBytes(Paths.get(CSV_FILE_RESOURCE));
-		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, CSV_FILE_NAME, CONTENT_TYPE_CSV, fileContent);
-
-		ResponseEntity<String> response = transactionController.uploadFile(file);
-
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(FILE_UPLOAD_SUCCESSFUL, response.getBody());
-
-	}
+	private byte[] fileContent = "File content".getBytes();
 
 	@Test
-	@DisplayName("Valid excel file upload")
-	public void testUploadFile_WithValidExcelFile_ReturnsSuccessResponse() throws Exception {
-
-		byte[] fileContent = Files.readAllBytes(Paths.get(EXCEL_FILE_RESOURCE));
-		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, EXCEL_FILE_NAME, CONTENT_TYPE_EXCEL, fileContent);
-
-		ResponseEntity<String> response = transactionController.uploadFile(file);
-
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(FILE_UPLOAD_SUCCESSFUL, response.getBody());
-
-	}
-
-	@Test
-	@DisplayName("Valid text file upload")
-	public void testUploadFile_WithValidTextFile_ReturnsSuccessResponse() throws Exception {
-
-		byte[] fileContent = Files.readAllBytes(Paths.get(TEXT_FILE_RESOURCE));
-		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, TEXT_FILE_NAME, CONTENT_TYPE_TXT, fileContent);
-
-		ResponseEntity<String> response = transactionController.uploadFile(file);
-
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(FILE_UPLOAD_SUCCESSFUL, response.getBody());
-
-	}
-
-	@Test
-	@DisplayName("Invalid file upload")
-	public void testUploadFile_WithInvalidFileType_ReturnsBadRequest() throws Exception {
-
-		byte[] fileContent = Files.readAllBytes(Paths.get(INVALID_FILE_RESOURCE));
-		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, INVALID_FILE_NAME, CONTENT_TYPE_PDF, fileContent);
-		doThrow(new IllegalArgumentException(INVALID_FILE_NAME_ERROR)).when(transactionService)
-				.processAndSaveTransactions(file);
-
-		ResponseEntity<String> response = transactionController.uploadFile(file);
-
-		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-		assertEquals(INVALID_FILE_NAME_ERROR, response.getBody());
-
-	}
-
-	@Test
-	@DisplayName("Empty file upload")
-	public void testUploadFile_WithEmptyFile_ReturnsBadRequest() throws Exception {
+	@DisplayName("Empty file upload - returns bad request")
+	public void shouldReturnBadRequestForEmptyFile() throws Exception {
 
 		byte[] emptyFileContent = new byte[0]; // Empty file content
 		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, CSV_FILE_NAME, CONTENT_TYPE_CSV, emptyFileContent);
-		doThrow(new IllegalArgumentException(FILE_IS_EMPTY)).when(transactionService).processAndSaveTransactions(file);
 
 		ResponseEntity<String> response = transactionController.uploadFile(file);
 
+		verify(transactionService, times(0)).processAndSaveTransactions(any(), any());
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 		assertEquals(FILE_IS_EMPTY, response.getBody());
-
 	}
 
 	@Test
-	@DisplayName("IOException when processing file")
-	public void testUploadFile_WithIOException_ReturnsBadRequest() throws Exception {
+	@DisplayName("Null or empty filename - returns bad request")
+	public void shouldReturnBadRequestForNullOrBlankFileName() throws Exception {
 
-		byte[] fileContent = "file content".getBytes();
-		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, CSV_FILE_NAME, CONTENT_TYPE_CSV, fileContent);
-		doThrow(new IOException()).when(transactionService).processAndSaveTransactions(file);
+		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, "", CONTENT_TYPE_CSV, fileContent);
 
 		ResponseEntity<String> response = transactionController.uploadFile(file);
 
+		verify(transactionService, times(0)).processAndSaveTransactions(any(), any());
 		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+		assertEquals(INVALID_FILE_NAME_ERROR, response.getBody());
+	}
+
+	@Test
+	@DisplayName("Invalid file extension - returns bad request")
+	public void shouldReturnBadRequestForInvalidFileName() throws Exception {
+
+		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, INVALID_FILE_NAME, CONTENT_TYPE_CSV, fileContent);
+
+		ResponseEntity<String> response = transactionController.uploadFile(file);
+
+		verify(transactionService, times(0)).processAndSaveTransactions(any(), any());
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+		assertTrue(response.getBody().contains(INVALID_FILE_EXTENSION));
+	}
+
+	@ParameterizedTest(name = "Valid {2} file upload - returns success request")
+	@CsvSource({ CSV_FILE_NAME + ", " + CONTENT_TYPE_CSV + ", " + CSV_EXTENSION,
+			EXCEL_FILE_NAME + ", " + CONTENT_TYPE_EXCEL + ", " + EXCEL_EXTENSION,
+			TEXT_FILE_NAME + ", " + CONTENT_TYPE_TEXT + ", " + FIXEDLENGTHFILEFORMAT_EXTENSION, })
+	public void shouldReturnSuccessReponseForValidFiles(String fileName, String contentType, String fileExtension)
+			throws IOException {
+
+		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, fileName, contentType, fileContent);
+
+		ResponseEntity<String> response = transactionController.uploadFile(file);
+
+		verify(transactionService, times(1)).processAndSaveTransactions(any(), any());
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(FILE_UPLOAD_SUCCESSFUL, response.getBody());
+	}
+
+	@ParameterizedTest(name = "Valid {2} file upload - returns success request")
+	@CsvSource({ CSV_FILE_NAME + ", " + CONTENT_TYPE_EXCEL + ", " + CSV_EXTENSION,
+			EXCEL_FILE_NAME + ", " + CONTENT_TYPE_CSV + ", " + EXCEL_EXTENSION,
+			TEXT_FILE_NAME + ", " + CONTENT_TYPE_CSV + ", " + FIXEDLENGTHFILEFORMAT_EXTENSION, })
+	public void shouldReturnBadReponseForInValidFileType(String fileName, String contentType, String fileExtension)
+			throws IOException {
+
+		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, fileName, contentType, fileContent);
+
+		ResponseEntity<String> response = transactionController.uploadFile(file);
+
+		verify(transactionService, times(0)).processAndSaveTransactions(any(), any());
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+		assertEquals(INVALID_FILE_TYPE, response.getBody());
+	}
+
+	@Test
+	@DisplayName("Service method throws exception - returns bad request")
+	public void shouldReturnBadRequestWhenServiceMethodThrowsIOException() throws Exception {
+
+		MockMultipartFile file = new MockMultipartFile(FILE_PARAM, CSV_FILE_NAME, CONTENT_TYPE_CSV, fileContent);
+		doThrow(IOException.class).when(transactionService).processAndSaveTransactions(any(), any());
+
+		ResponseEntity<String> response = transactionController.uploadFile(file);
+
+		response = transactionController.uploadFile(file);
+		assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+
 	}
 
 }
